@@ -17,9 +17,10 @@ passport.deserializeUser((id, done) => {
 
 passport.use("local", new localStrategy({
 	usernameField: "username",
-  	passwordField: "password"
+  passwordField: "password",
+  passReqToCallback: true
 },
-function(username, password, done) {
+function(req, username, password, done) {
 	User.findOne({username: username}, function(err, user) {
     if(err) {
       return done(null, false, {
@@ -34,7 +35,7 @@ function(username, password, done) {
         message: "Väärä salasana!"
       });
     } else {
-      return done(null, user);
+      return done(null, user, req.flash("success", user.username+" welcome back to YelpCamp."));
     }
   });
 }));

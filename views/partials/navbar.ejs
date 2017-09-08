@@ -9,7 +9,8 @@
 		<div id="navCollapsed" class="collapse navbar-collapse">
 			<ul id="MainNav1" class="nav navbar-nav navbar-left">
 				<li><a class="page-scroll" href="/">YelpCamp</a></li>
-				<li><a class="page-scroll" href="/api/campgrounds">Campgrounds</a></li>
+				<li><a class="page-scroll" href="/api/campgrounds">Explore</a></li>
+				<li><a href="/api/campgrounds/new">Create</a></li>
 				<form id="searchForm" class="navbar-form navbar-left">
         			<div class="form-group">
           				<input id="Search" type="text" class="form-control" placeholder="Search...">
@@ -23,7 +24,8 @@
 				<% if(!user) { %>
 					<li><a href="/login"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a></li>
 				<% } else { %>
-					<li><a href="/api/profile"><i class="fa fa-user" aria-hidden="true"></i> <%= user.username %> profile</a></li>
+					<li><a href="/api/notifications"><i class="fa fa-bell"></i> Notifications <span class="badge"></span></a></li>
+					<li><a href="/api/profile"><i class="fa fa-user" aria-hidden="true"></i> <%= user.username %></a></li>
 					<li><a href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
 				<% } %>
 			</ul>

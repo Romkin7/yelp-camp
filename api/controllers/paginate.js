@@ -72,10 +72,10 @@ module.exports.paginateCampgrounds = function(req, res, next) {
         .exec(function(err, count) {
           if(err) return res.status(500).json(err);
           setOutput(campgrounds, count);
-          res.status(200).json({
-            "campgrounds": output.data,
-            "pages": output.pages,
-            "items": output.items
+          res.render("campground/index.ejs", {
+            campgrounds: output.data,
+            pages: output.pages,
+            items: output.items
           });
         });
       }
@@ -100,6 +100,30 @@ module.exports.paginateCampgrounds = function(req, res, next) {
       });
     });
   }
+};
+
+//Paginate users campgrounds
+module.exports.paginateUserCampgrounds = (req, res, next) => {
+  Campground
+    .find()
+    .where('author.id').equals(req.user.id)
+    .sort({"created": value})
+    .skip((page - 1) * perPage)
+    .limit(perPage)
+    .exec(function(err, campgrounds) {
+      if(err) return next(err);
+      Campground.count()
+      .where('author.id').equals(req.user.id)
+      .exec(function(err, count) {
+        if(err) return res.status(500).json(err);
+        setOutput(campgrounds, count);
+        res.render("profile/profile.ejs", {
+          campgrounds: output.data,
+          pages: output.pages,
+          items: output.items
+        });
+      });
+    });
 };
 
 function escapeRegex(text) {

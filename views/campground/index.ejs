@@ -1,4 +1,4 @@
-<% layout ('layout') -%>
+<% layout('layout') -%>
 <section id="campgrounds-page">
 	<div class="container">
 		<div id="campgrounds" class="row">
@@ -7,12 +7,51 @@
 					<div class="col-md-4 col-sm-4 col-xs-6 grid-item rig-cell">
 						<img class="rig-img" src="<%=campground.cover %>">
 						<h4 class="rig-header"><%= campground.name %></h4>
-						<p class="rig-text"><%= campground.price %></p>
+						<p class="rig-text"><%= campground.price %> €/day</p>
 						<a class="rig-icon" href="/api/campgrounds/<%=campground._id %>"><i class="fa fa-plus" aria-hidden="true"></i></a>
 						<div class="rig-overlay"></div>
 					</div>
 				<% }); %>
 			</div>
+		</div>
+		<div class="row">
+			<nav>
+				<div class="col-md-6 col-md-offset-3 text-center">
+					<ul class="pagination pagination-lg">
+						<% if(pages.current > 1 && pages.hasPrev === true) { %>
+						<li>
+      						<a href="/api/campgrounds?page=<%= pages.prev %>" aria-label="Previous">
+        						<span aria-hidden="true">&laquo;</span>
+      						</a>
+    					</li>
+    					<% } else { %>
+    					<li>
+      						<a class="btn btn-xs disabled" href="#" aria-label="Previous">
+        						<span aria-hidden="true">&laquo;</span>
+      						</a>
+    					</li>
+    					<% } %>
+   						<li>
+    					<% for(var i = 1; i < pages.total +1; i++) { %> 
+    					<li><a href="/api/campgrounds?page=<%= i %>"><%= i %></a></li>
+    					<% } %>
+    					</li>
+    					<% if(pages.current < pages.total && pages.hasNext === true) { %>
+    					<li>
+      						<a href="/api/campgrounds?page=<%= pages.next %>" aria-label="Next">
+        						<span aria-hidden="true">&raquo;</span>
+      						</a>
+    					</li>
+    					<% } else { %>
+    					<li>
+      						<a class="btn btn-xs disabled" href="#" aria-label="Next">
+        						<span aria-hidden="true">&raquo;</span>
+      						</a>
+    					</li>
+    					<% } %>
+					</ul>
+				</div>
+			</nav>	
 		</div>
 	</div>
 </section>

@@ -24,7 +24,7 @@ const storage = multerS3({
 	bucket: process.env.BUCKET_NAME,
 	key: (req, file, cb) => {
 		let fileExtension = file.originalname.split('.')[1];
-		let path = "covers/"+req.body.name+Date.now()+'.'+fileExtension;
+		let path = "covers/"+req.user.username+Date.now()+'.'+fileExtension;
 		cb(null, path);
 	}
 });
@@ -51,7 +51,8 @@ function validateFileType(req, res, next){
 
 //Get all campgrounds
 module.exports.getAllCampgrounds = (req, res, next) => {
-	paginate.paginateCampgrounds(req, res, next);
+	let foundUser = null;
+	paginate.paginateCampgrounds(req, res, foundUser, next);
 };
 
 //Get post form
@@ -61,33 +62,57 @@ module.exports.getPostForm = (req, res, next) => {
 
 //Post new campground
 module.exports.createCampground = (req, res, next) => {
-	upload(req, res, (err)	=> {
+	var campground = new Campground();
+	campground.name = req.body.name;
+	//campground.images = _splitArray(req.body.images);
+	campground.street = req.body.location;
+	campground.price = req.body.price;
+	campground.description = req.body.description;
+	campground.author = {
+		id: req.user._id,
+		username: req.user.username
+	};
+	campground.save((err, newCampground) => {
 		if(err) {
-			req.flash("error", err.message);
-			res.redirect("back");
-			return;
+			res.status(500).send(err.message);
 		} else {
-			var cover = "";
-			if(typeof req.file !== undefined) {
-				cover = req.file.key;
-				console.log(cover);
-			}
-			var campground = new Campground();
-			campground.name = req.body.name;
-			campground.images = _splitArray(req.body.images);
-			campground.cover = cover;
-			campground.price = req.body.price;
-			campground.description = req.body.description;
-			campground.author = "Roman Tuomisto";
-			campground.save((err, newCampground) => {
-				if(err) {
-					res.status(500).send(err.message);
-				} else {
-					res.redirect("/campgrounds");
-				}
-			});
+			req.flash("success", "Campground \""+newCampground.name+"\" has been created.");
+			res.redirect("/api/campgrounds/"+newCampground._id);
 		}
 	});
 };
 
+module.exports.uploadCoverImage = (req, res, next) => {
+	upload(req, res, (err)  => {
+    	if(err) {
+      		req.flash("error", err.message);
+      		res.redirect("back");
+     	 	return;
+    	} else {
+      		var file = "";
+      		if(typeof req.file !== undefined) {
+        	file = req.file.key;
+        	console.log(file);
+      	}
+    }
+  });
+};
+
 //Get one campground
+module.exports.getCampground = (req, res, next) => {
+	Campground.findById(req.params.id, (err, foundCampground) => {
+		if(err) {
+			req.flash("error", err.message);
+			res.redirect("back");
+			return;
+		} else if(!foundCampground) {
+			req.flash("error", "Couldn't find Campground.");
+			res.redirect("back");
+			return;
+		} else {
+			res.render("campground/show.ejs", {
+				campground: foundCampground
+			});
+		}
+	});
+};

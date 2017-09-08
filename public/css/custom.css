@@ -3,11 +3,15 @@ header {
   width: 100%;
 	top: 50px;
 	padding-top: 50px;
-	height: 50vh;
-	background: url(../images/bcg.jpeg);
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position: 60% 50%;
+	height: 5vh;
+}
+
+#layout1 {
+  height: 50vh;
+  background: url(../images/bcg.jpeg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 60% 50%;
 }
 
 header .jumbotron {
@@ -25,9 +29,14 @@ footer {
 }
 
 section {
+  min-height: 100vh;
 	margin-top: 50px;
   padding: 60px;
   height: 100%;
+}
+
+#campgrounds-page .row:nth-of-type(2) {
+  margin-top: 45px;
 }
 
 /* Header and text styles */
@@ -179,7 +188,7 @@ footer p {
 }
 
 .rig .rig-cell:hover .rig-img {
-    transform:scale(1.03);
+    transform:scale(1.01);
 }
 
 /* If have the overlay layer */
@@ -215,7 +224,6 @@ footer p {
     left:0;
     width:100%;
     text-align:center;
-    text-transform:capitalize;
     font-family: 'Yrsa', serif;
     font-size:24px;
     font-weight:bold;

@@ -10,6 +10,7 @@ const session 		= require('express-session');
 const mongoStore	= require('connect-mongo')(session);
 const flash 		= require('express-flash');
 const mongoose 		= require('mongoose');
+const passport 		= require('passport');
 const moment 		= require('moment');
 const path 			= require('path');
 const ejs 			= require('ejs');
@@ -21,6 +22,7 @@ const User 			= require("./models/user");
 //Routes
 //const indexRoutes 	= require('./api/routes');
 const authRoutes		= require('./api/routes/auth');
+const profileRoutes 	= require('./api/routes/profile');
 const campgroundRoutes 	= require('./api/routes/campground');
 
 //initialize express app
@@ -50,6 +52,8 @@ app.use(session({
 	store: new mongoStore({url: process.env.DATABASE, autoReconnect: true})
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash());
 
 // Logging middleware
@@ -70,6 +74,7 @@ app.use(function(req, res, next) {
 //Use routes
 //app.use("/", indexRoutes);
 app.use("/", authRoutes);
+app.use("/api/profile", profileRoutes);
 app.use("/api/campgrounds", campgroundRoutes);
 
 //Start server

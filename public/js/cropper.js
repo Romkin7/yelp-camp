@@ -186,6 +186,7 @@ $(document).ready(function() {
   postForm.on("submit", function(event) {
     event.preventDefault();
     validateInputs();
+    console.log(coverImage);
     if(coverImage !== null && campground.name !== "" && campground.description !== "" && campground.location !== "" && campground.price !== null) {
       $.ajax({
         type: "POST",

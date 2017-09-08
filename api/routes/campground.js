@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 
+const authObj = require('../config/authObj');
 const campgroundCtrl = require('../controllers/campgroundCtrl');
 
 // "/campground"
@@ -12,6 +13,10 @@ router
 
 router
 	.route("/new")
-	.get(campgroundCtrl.getPostForm);
+	.get(authObj.isLoggedIn, campgroundCtrl.getPostForm);
+
+router
+	.route("/:id")
+	.get(campgroundCtrl.getCampground);
 
 module.exports = router;

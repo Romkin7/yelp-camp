@@ -6,29 +6,27 @@ var mongoose = require("mongoose"),
 
 var campgroundSchema = new Schema({
 	name: String,
-	cover: String,
-	images: [{type: String}],
+	cover: {type: String, default: "/images/no-image.png"},
+	//images: [{type: String}],
 	description: String,
 	price: String,
-	author: String,
-	created: {type: Date, default: Date.now}
-	// author: {
-	// 	id: {
-	// 		type: mongoose.Schema.Types.ObjectId,
-	// 		ref: "User"
-	// 	},
-	// 	username: String
-	// },
+	author: {
+		id: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User"
+		},
+		username: String
+	},
 	// blogs: [{
 	// 	type: mongoose.Schema.Types.ObjectId,
 	// 	ref: "Blog"
 	// }],
-	// street: String,
+	street: String,
 	// location:{
- //        type: {type: String, default: "Point"},
+ // 	    type: {type: String, default: "Point"},
 	// 	coordinates: {type: [Number], default: [0,0]}
- //    },
-	// created: {type: Date, default: Date.now},
+ // 	},
+	created: {type: Date, default: Date.now}
 	// comments: [
 	// {
 	// 	type: mongoose.Schema.Types.ObjectId,

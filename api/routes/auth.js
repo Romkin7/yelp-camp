@@ -4,27 +4,32 @@ const router = express.Router();
 const passport = require('passport');
 
 const authCtrl = require('../controllers/authCtrl');
+const passportConf = require('../config/passport');
 
 router
 	.route('/login')
 	.get(authCtrl.getLoginForm)
-	.post(passport.authenticate('local',{
-  		successRedirect: '/profile',
-  		failureRedirect: '/signin',
+	.post(passport.authenticate('local', {
+  		successRedirect: '/api/profile',
+  		failureRedirect: '/login',
   		failureFlash: true
 	}));
 
 router
-	.route("/register")
+	.route("/signup")
 	.get(authCtrl.getRegisterForm)
 	.post(authCtrl.register);
 
 router
-	.route('/compare')
-	.post(authCtrl.compare);
+	.route('/compareuname')
+	.post(authCtrl.compareUname);
+
+router
+	.route('/compareemail')
+	.post(authCtrl.compareEmail);
 
 router
 	.route('/logout')
-	.post(authCtrl.logOut);
+	.get(authCtrl.logOut);
 
 module.exports = router;
