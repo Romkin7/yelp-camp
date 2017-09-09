@@ -1,4 +1,4 @@
-"Use strict";
+"use strict";
 const Campground = require('../../models/campground');
 const User = require('../../models/user');
 

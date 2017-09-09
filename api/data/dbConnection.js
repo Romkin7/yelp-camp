@@ -50,3 +50,5 @@ process.once('SIGUSR2', function() {
 });
 
 require("../../models/campground");
+require('../../models/user');
+require('../../models/notification');

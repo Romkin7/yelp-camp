@@ -9,10 +9,16 @@ var UserSchema = new mongoose.Schema({
 		lastname: String
 	},
   campgrounds: [
-            {
-              type: mongoose.Schema.Types.ObjectId,
-              ref: "Campground"
-            }
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Campground"
+    }
+  ],
+  notifications: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Notification"
+    } 
   ],
   status: {type: Boolean, default: false},
 	username: {type: String, unique: true, required: true},

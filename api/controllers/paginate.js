@@ -64,15 +64,15 @@ module.exports.paginateCampgrounds = function(req, res, next) {
         return res.status(500).json({"error": err.message});
       }
       if(!campgrounds) {
-        return res.status(404).json({
-          "error": "Valitettavasti antamallasi hakusanalla "+regex+", ei löytynyt yhtään tulosta."
-        });
+        req.flash("error", "Valitettavasti antamallasi hakusanalla "+regex+", ei löytynyt yhtään tulosta.");
+        res.redirect('back');
+        return;
       } else {
         Campground.count().where("name").equals(req.query.search)
         .exec(function(err, count) {
           if(err) return res.status(500).json(err);
           setOutput(campgrounds, count);
-          res.render("campground/index.ejs", {
+          res.status(200).json({
             campgrounds: output.data,
             pages: output.pages,
             items: output.items

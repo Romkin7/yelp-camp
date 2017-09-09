@@ -9,7 +9,7 @@ var searchBtn = document.getElementById('searchBtn');
 var errorMsg = document.querySelector("#errorMsg");
 var successMsg = document.querySelector("#successMsg");
 //Page grid
-var campgroundGrid = document.getElementById("campgrounds");
+var campgroundGrid = document.querySelector(".grid");
 
 //Get input value and send ajax request to handle db query
 $(searchForm).on("submit", function(event) {
@@ -26,12 +26,21 @@ $(searchForm).on("submit", function(event) {
 				$(errorMsg).html()
 				$(searchInput).val("");
 				$(searchBtn).prop("disabled", false);
-
 			} else {
 				$(campgroundGrid).html("");
 				$(searchInput).val("");
 				$(searchBtn).prop("disabled", false);
-				console.log(response);
+				response.campgrounds.forEach(function(campground) {
+					$(campgroundGrid).append(`
+						<div class="col-md-4 col-sm-4 col-xs-6 grid-item rig-cell">
+						<img class="rig-img" src="${campground.cover}">
+						<h4 class="rig-header">${campground.name}</h4>
+						<p class="rig-text">${campground.price} €/day</p>
+						<a class="rig-icon" href="/api/campgrounds/${campground._id}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+						<div class="rig-overlay"></div>
+					</div>
+					`)
+				});
 			}
 		})
 	}
