@@ -1,3 +1,5 @@
+$("#submitBtn").hide();
+$("#imageBtns").hide();
 $(document).ready(function() {
   var _URL = window.URL || window.webkitURL;
   //Dom element variables
@@ -50,6 +52,8 @@ $(document).ready(function() {
     imageBtns.hide();
     pickImage.show();
     pickImage.prop("disabled", true);
+    validateInputs();
+    $.post("/api/campgrounds/data", )
     console.log(coverImage);
   });
   /* *** WHEN CLICK ON RESET *** */
@@ -97,9 +101,9 @@ $(document).ready(function() {
     var id = id;
     var type = document.getElementById(id).files[0].type;
     type = type.toString();
-    if(type !== "image/jpg" && type !== "image/png" && type !== "image/jpeg") {
+    if(type !== "image/jpg" && type !== "image/png" && type !== "image/jpeg" && type !== "image/bmp") {
       reset();
-      errorMsg.html("Only jpg, png or jpeg image types are allowed.");
+      errorMsg.html("Only jpg, png, bmp or jpeg image types are allowed.");
       return false;
     } else {
       return true;
@@ -134,7 +138,9 @@ $(document).ready(function() {
     validateDescription(descriptionVal);
     validatePrice(priceVal);
     validateLocation(locationVal);
-    //Functions that will validate fields
+    console.log(campground);
+  };
+  //Functions that will validate fields
     //Name input
     function validateName(nameVal) {
       if(nameVal === "") {
@@ -181,26 +187,15 @@ $(document).ready(function() {
         campground.location = locationVal;
       }
     };
-  };
   //Submit form
-  postForm.on("submit", function(event) {
+  postForm.on("change", function(event) {
     event.preventDefault();
     validateInputs();
     console.log(coverImage);
-    if(coverImage !== null && campground.name !== "" && campground.description !== "" && campground.location !== "" && campground.price !== null) {
-      $.ajax({
-        type: "POST",
-        data: {
-          campground: campground,
-          file: coverImage
-        },
-        success: function(data) {
-          console.log('Success!')
-        },
-        error: function(jqXHR, textStatus, err) {
-          console.log('text status '+textStatus+', err '+err)
-        }
-      });
+    if(coverImage !== undefined && campground.name !== "" && campground.description !== "" && campground.location !== "" && campground.price !== null) {
+      $("#submitBtn").show();
+    } else {
+      $("#submitBtn").hide();
     }
   });
 });

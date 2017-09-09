@@ -3,12 +3,18 @@
 const mongoose 		= require('mongoose');
 const fs 			= require('fs');
 const aws			= require('aws-sdk');
+const fileType 		= require('file-type');
+const jimp			= require('jimp');
 const multer 		= require('multer');
 const multerS3 		= require('multer-s3');
 //Schemas
 const Campground 	= require('../../models/campground');
 //Pagination module
 const paginate 		= require('./paginate');
+
+//Variables to store upload image data
+var cropperData= {};
+var croppedImg;
 
 //Create new file-Upload System
 aws.config.update({
