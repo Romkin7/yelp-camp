@@ -129,7 +129,7 @@ module.exports.createCampground = (req, res, next) => {
 								var scaleX = Number(cropperData.scaleX);
 								var scaleY = Number(cropperData.scaleY);
 								lenna.rotate(rotate).scale(scaleX).crop(x, y, width, height).quality(60)
-								.resize(1200, 675).write(`./public/images/cropped-images/${featuredImg}`, (err, croppedImg) => {
+								.resize(650, 406).write(`./public/images/cropped-images/${featuredImg}`, (err, croppedImg) => {
 									if(err) {
 										req.flash("error", err.message);
 										res.redirect('back');
