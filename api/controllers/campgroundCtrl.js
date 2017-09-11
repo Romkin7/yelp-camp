@@ -151,22 +151,6 @@ module.exports.createCampground = (req, res, next) => {
 	});
 };
 
-module.exports.uploadCoverImage = (req, res, next) => {
-	upload(req, res, (err)  => {
-    	if(err) {
-      		req.flash("error", err.message);
-      		res.redirect("back");
-     	 	return;
-    	} else {
-      		var file = "";
-      		if(typeof req.file !== undefined) {
-        	file = req.file.key;
-        	console.log(file);
-      	}
-    }
-  });
-};
-
 //Get one campground
 module.exports.getCampground = (req, res, next) => {
 	Campground.findById(req.params.id, (err, foundCampground) => {
