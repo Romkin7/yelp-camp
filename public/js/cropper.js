@@ -29,8 +29,9 @@ $(document).ready(function() {
         $("#imgPreview")
           .on("load", function() {
             errorMsg.html('');
-            cropImage(4/3, 650, 406);
+            cropImage(4/3);
             pickImage.hide();
+            $("#submitBtn").hide();
             imageBtns.show();
           })
           .on("error", function() {
@@ -52,6 +53,7 @@ $(document).ready(function() {
         $('#imgPreview').cropper('destroy');
         $("#imgPreview").removeAttr("src");
         imageBtns.hide();
+        $("#submitBtn").show();
         pickImage.show();
         pickImage.prop("disabled", true);
         validateInputs();
@@ -142,18 +144,20 @@ $(document).ready(function() {
     validateDescription(descriptionVal);
     validatePrice(priceVal);
     validateLocation(locationVal);
-    console.log(campground);
   };
   //Functions that will validate fields
     //Name input
     function validateName(nameVal) {
       if(nameVal === "") {
+        $("#title").removeClass("valid");
         $("#title").addClass("invalid");
         campground.name = "";
       } else if(nameVal.length < 3) {
+        $("#title").removeClass("valid");
         $("#title").addClass("invalid");
         campground.name = "";
       } else {
+        $("#title").removeClass("invalid");
         $("#title").addClass("valid");
         campground.name = nameVal;
       }
@@ -161,12 +165,11 @@ $(document).ready(function() {
     //Description input
     function validateDescription(descriptionVal) {
       if(descriptionVal === "") {
-        $("#description").addClass("invalid");
-        campground.description = "";
-      } else if(descriptionVal.length < 5) {
+        $("#description").removeClass("valid");
         $("#description").addClass("invalid");
         campground.description = "";
       } else {
+        $("#description").removeClass("invalid");
         $("#description").addClass("valid");
         campground.description = descriptionVal;
       }
@@ -174,9 +177,11 @@ $(document).ready(function() {
     //Price input
     function validatePrice(priceVal) {
       if(priceVal === null) {
+        $("#price").removeClass("valid");
         $("#price").addClass("invalid");
         campground.price = null;
       } else {
+        $("#price").removeClass("invalid");
         $("#price").addClass("valid");
         campground.price = priceVal;
       }
@@ -184,9 +189,11 @@ $(document).ready(function() {
     //Location input
     function validateLocation(locationVal) {
       if(locationVal === "") {
+        $("#location").removeClass("valid");
         $("#location").addClass("invalid");
         campground.location = "";
       } else {
+        $("#location").removeClass("invalid");
         $("#location").addClass("valid");
         campground.location = locationVal;
       }
