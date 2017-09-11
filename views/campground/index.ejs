@@ -5,7 +5,7 @@
 			<div class="grid rig">
 				<% campgrounds.forEach(function(campground) { %>
 					<div class="col-md-4 col-sm-4 col-xs-6 grid-item rig-cell">
-						<img class="rig-img" src="<%=campground.cover %>">
+						<img class="rig-img" src="<%=campground.cover %>" alt="<%= campground.cover %>">
 						<h4 class="rig-header"><%= campground.name %></h4>
 						<p class="rig-text"><%= campground.price %> €/day</p>
 						<a class="rig-icon" href="/api/campgrounds/<%=campground._id %>"><i class="fa fa-plus" aria-hidden="true"></i></a>

@@ -1,15 +1,21 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 
 const authObj = require('../config/authObj');
 const campgroundCtrl = require('../controllers/campgroundCtrl');
+
 
 // "/campground"
 router
 	.route("/")
 	.get(campgroundCtrl.getAllCampgrounds)
-	.post(campgroundCtrl.createCampground);
+	.post(authObj.isLoggedIn, campgroundCtrl.createCampground);
+
+router
+	.route("/data")
+	.post(authObj.isLoggedIn, campgroundCtrl.getCropperData);
 
 router
 	.route("/new")

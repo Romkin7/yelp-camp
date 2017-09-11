@@ -1,4 +1,4 @@
-$("#submitBtn").hide();
+$("#submitBtn").prop("disabled", true);
 $("#imageBtns").hide();
 $(document).ready(function() {
   var _URL = window.URL || window.webkitURL;
@@ -47,14 +47,18 @@ $(document).ready(function() {
   $("#submitImage").on("click", function(event) {
     event.preventDefault();
     coverImage = $("#imgPreview").cropper("getData", true);
-    $('#imgPreview').cropper('destroy');
-    $("#imgPreview").removeAttr("src");
-    imageBtns.hide();
-    pickImage.show();
-    pickImage.prop("disabled", true);
-    validateInputs();
-    $.post("/api/campgrounds/data", )
-    console.log(coverImage);
+    $.post("/api/campgrounds/data", coverImage, (response) => {
+      if(response === "success") {
+        $('#imgPreview').cropper('destroy');
+        $("#imgPreview").removeAttr("src");
+        imageBtns.hide();
+        pickImage.show();
+        pickImage.prop("disabled", true);
+        validateInputs();
+      } else {
+        return;
+      }
+    });
   });
   /* *** WHEN CLICK ON RESET *** */
   $('#resetImage').on('click', function () {
@@ -191,11 +195,10 @@ $(document).ready(function() {
   postForm.on("change", function(event) {
     event.preventDefault();
     validateInputs();
-    console.log(coverImage);
     if(coverImage !== undefined && campground.name !== "" && campground.description !== "" && campground.location !== "" && campground.price !== null) {
-      $("#submitBtn").show();
+      $("#submitBtn").prop("disabled", false);
     } else {
-      $("#submitBtn").hide();
+      $("#submitBtn").prop("disabled", true);
     }
   });
 });

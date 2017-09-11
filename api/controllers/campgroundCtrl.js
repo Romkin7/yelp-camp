@@ -4,38 +4,71 @@ const mongoose 		= require('mongoose');
 const fs 			= require('fs');
 const aws			= require('aws-sdk');
 const fileType 		= require('file-type');
+const readChunk		= require('read-chunk');
 const jimp			= require('jimp');
 const multer 		= require('multer');
-const multerS3 		= require('multer-s3');
+const streamingS3	= require('streaming-s3');
 //Schemas
 const Campground 	= require('../../models/campground');
 //Pagination module
 const paginate 		= require('./paginate');
 
 //Variables to store upload image data
-var cropperData= {};
-var croppedImg;
+let cropperData;
+let featuredImg;
+let featuredMinImg;
+let awsResponse;
+let stats;
 
 //Create new file-Upload System
-aws.config.update({
-	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  	accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  	region: 'eu-west-1'
+var storage =   multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/images/uploads');
+  },
+  filename: function (req, file, callback) {
+  	var fileExtension = file.originalname.split('.')[1];
+  	featuredImg = req.user.username+Date.now()+'.'+fileExtension;
+    callback(null, featuredImg);
+  }
 });
+var upload = multer({ storage : storage}).single('image');
 
-const s3 = new aws.S3();
-
-const storage = multerS3({
-	s3: s3,
-	bucket: process.env.BUCKET_NAME,
-	key: (req, file, cb) => {
-		let fileExtension = file.originalname.split('.')[1];
-		let path = "covers/"+req.user.username+Date.now()+'.'+fileExtension;
-		cb(null, path);
-	}
-});
-
-var upload = multer({storage: storage}).any("images", 3);
+//configure aws flieStream
+function streamToS3Aws(req, res, next) {
+	var fStream = fs.createReadStream('./public/images/cropped-images/'+featuredMinImg);
+	var streamToS3 = new streamingS3(fStream,{accessKeyId: process.env.AWS_ACCESS_KEY_ID, secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, region: 'eu-west-1'}, {
+		Bucket: process.env.BUCKET_NAME,
+		Key: featuredMinImg,
+		ContentType: "image/jpg" || "image/png" || "image/jpeg" || "image/bmp"
+	}, (err, response, stats) => {
+		if(err) {
+			req.flash("error", "Error while uploaading image to S3 cloud.");
+			res.redirect("back");	
+			return;
+		} else {
+			var campground = new Campground();
+			campground.name = req.body.name;
+			//campground.images = response.Location;
+			campground.street = req.body.location;
+			campground.cover = response.Location;
+			campground.price = req.body.price;
+			campground.description = req.body.description;
+			campground.author = {
+				id: req.user._id,
+				username: req.user.username
+			};
+			campground.save((err, newCampground) => {
+				if(err) {
+					res.status(500).send(err.message);
+				} else {
+					req.flash("success", "Campground \""+newCampground.name+"\" has been created.");
+					res.redirect("/api/campgrounds/"+newCampground._id);
+					return;
+				}
+			});
+		}
+	});
+};
 
 //Array splitterhelper
 var _splitArray = (input) => {
@@ -46,13 +79,6 @@ var _splitArray = (input) => {
 		output = [];
 	}
 	return output;
-};
-
-//Validate fileType
-function validateFileType(req, res, next){
-	//Setup filetype check
-	const buffer = readChunk.sync(req.files[0].image, 0, 4100);
-	fileType(buffer);
 };
 
 //Get all campgrounds
@@ -67,23 +93,60 @@ module.exports.getPostForm = (req, res, next) => {
 };
 
 //Post new campground
+module.exports.getCropperData = (req, res, next) => {
+	/***** GRAB DATA FROM AJAX *****/
+	cropperData = req.body;
+	console.log(cropperData);
+	if(cropperData !== undefined) {
+		res.send('success');
+	} else {
+		res.send("error");
+	}
+};
+
 module.exports.createCampground = (req, res, next) => {
-	var campground = new Campground();
-	campground.name = req.body.name;
-	//campground.images = _splitArray(req.body.images);
-	campground.street = req.body.location;
-	campground.price = req.body.price;
-	campground.description = req.body.description;
-	campground.author = {
-		id: req.user._id,
-		username: req.user.username
-	};
-	campground.save((err, newCampground) => {
+	upload(req, res, (err) => {
 		if(err) {
-			res.status(500).send(err.message);
+			req.flash("error", err.message);
+			res.redirect('back');
+			return;
 		} else {
-			req.flash("success", "Campground \""+newCampground.name+"\" has been created.");
-			res.redirect("/api/campgrounds/"+newCampground._id);
+			if(req.file) {
+				const buffer = readChunk.sync(`./public/images/uploads/${featuredImg}`, 0, 4100);
+				if ((fileType(buffer) && fileType(buffer).mime === 'image/png') || (fileType(buffer) && fileType(buffer).mime === 'image/jpg') || (fileType(buffer) && fileType(buffer).mime === 'image/jpeg')) {
+					jimp.read(`./public/images/uploads/${featuredImg}`, (err, lenna) => {
+						if(err) {
+							req.flash("error", err.message);
+							res.redirect('back');
+							return;
+						} else {
+							if(lenna.bitmap.width > 800 && lenna.bitmap.height > 450) {
+								var x = Number(cropperData.x);
+								var y = Number(cropperData.y);
+								var width = Number(cropperData.width);
+								var height = Number(cropperData.height);
+								var rotate = Number(cropperData.rotate);
+								var scaleX = Number(cropperData.scaleX);
+								var scaleY = Number(cropperData.scaleY);
+								lenna.rotate(rotate).scale(scaleX).crop(x, y, width, height).quality(60)
+								.resize(1200, 675).write(`./public/images/cropped-images/${featuredImg}`, (err, croppedImg) => {
+									if(err) {
+										req.flash("error", err.message);
+										res.redirect('back');
+										return;
+									} else {
+										featuredMinImg = featuredImg;
+										streamToS3Aws(req, res, next);	
+									}
+								}); 
+							}
+						}
+					});
+				}
+			} else {
+				req.flash("error", "No image found to upload.");
+				res.redirect("back");
+			}
 		}
 	});
 };
